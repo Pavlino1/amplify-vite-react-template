@@ -1,22 +1,41 @@
 import React, { useState } from "react";
 
+interface FormState {
+  field1: string;
+  field2: string;
+  field3: string;
+  field4: string;
+}
+
 function App() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     field1: "",
     field2: "",
     field3: "",
     field4: "",
   });
+  const [loading, setLoading] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    alert(
-      `Vyhledat: ${form.field1}, ${form.field2}, ${form.field3}, ${form.field4}`
-    );
+    setLoading(true);
+    try {
+      const query = encodeURIComponent(form.field1);
+      const response = await fetch(`https://www.google.com/search?q=${query}`);
+      const html = await response.text();
+      // Získání titulku stránky z HTML
+      const match = html.match(/<title>(.*?)<\/title>/i);
+      const title = match ? match[1] : "Nebylo nalezeno";
+      setForm((f: FormState) => ({ ...f, field4: title }));
+    } catch (err) {
+      setForm((f: FormState) => ({ ...f, field4: "Chyba při vyhledávání" }));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -58,8 +77,11 @@ function App() {
           placeholder="String 4"
           value={form.field4}
           onChange={handleChange}
+          readOnly
         />
-        <button type="submit">Vyhledat</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Vyhledávám..." : "Vyhledat"}
+        </button>
       </form>
     </main>
   );
