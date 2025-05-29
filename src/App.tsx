@@ -1,38 +1,66 @@
-import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
-
-const client = generateClient<Schema>();
+import React, { useState } from "react";
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [form, setForm] = useState({
+    field1: "",
+    field2: "",
+    field3: "",
+    field4: "",
+  });
 
-  useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }, []);
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    alert(
+      `Vyhledat: ${form.field1}, ${form.field2}, ${form.field3}, ${form.field4}`
+    );
   }
 
   return (
     <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
+      <h1>Amplify úvodní stránka</h1>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1em",
+          maxWidth: 400,
+        }}
+      >
+        <input
+          type="text"
+          name="field1"
+          placeholder="String 1"
+          value={form.field1}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="field2"
+          placeholder="String 2"
+          value={form.field2}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="field3"
+          placeholder="String 3"
+          value={form.field3}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="field4"
+          placeholder="String 4"
+          value={form.field4}
+          onChange={handleChange}
+        />
+        <button type="submit">Vyhledat</button>
+      </form>
     </main>
   );
 }
