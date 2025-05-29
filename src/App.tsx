@@ -25,7 +25,7 @@ function App() {
     setLoading(true);
     try {
       const query = encodeURIComponent(form.field1);
-      const response = await fetch(`https://www.google.com/search?q=${query}`);
+      const response = await fetch(`https://www.boredapi.com/api/activity?type=${query}`);
       const html = await response.text();
       // Získání titulku stránky z HTML
       const match = html.match(/<title>(.*?)<\/title>/i);
